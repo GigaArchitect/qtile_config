@@ -73,10 +73,10 @@ keys = [
              lazy.shutdown(),
              desc='Shutdown Qtile'
              ),
-         Key(["control", "shift"], "e",
-             lazy.spawn("emacsclient -c -a emacs"),
-             desc='Doom Emacs'
-             ),
+         # Key(["control", "shift"], "e",
+         #     lazy.spawn("emacsclient -c -a emacs"),
+         #     desc='Doom Emacs'
+         #     ),
          ### Switch focus to specific monitor (out of three)
          Key([mod], "w",
              lazy.to_screen(0),
@@ -92,12 +92,12 @@ keys = [
              ),
          ### Switch focus of monitors
          Key([mod], "period",
-             lazy.next_screen(),
-             desc='Move focus to next monitor'
+             lazy.screen.next_group(),
+             desc='Move focus to next group'
              ),
          Key([mod], "comma",
-             lazy.prev_screen(),
-             desc='Move focus to prev monitor'
+             lazy.screen.prev_group(),
+             desc='Move focus to prev group'
              ),
          ### Treetab controls
           Key([mod, "shift"], "h",
@@ -179,6 +179,9 @@ groups = [Group("1", layout='monadtall'),
           Group("7", layout='monadtall'),
           Group("8", layout='monadtall'),
           Group("9", layout='monadtall'),
+          Group("10", layout='monadtall'),
+          Group("11", layout='monadtall'),
+          Group("12", layout='monadtall'),
           ]
 
 # Allow MODKEY+[0 through 9] to bind to groups, see https://docs.qtile.org/en/stable/manual/config/groups.html
