@@ -17,7 +17,7 @@ from qtile_extras.widget.decorations import BorderDecoration
 mod = "mod4"              # Sets mod key to SUPER/WINDOWS
 myTerm = "alacritty"      # My terminal of choice
 #myTerm = "cool-retro-term"      # My terminal of choice
-myBrowser = "brave" # My browser of choice
+myBrowser = "firefox" # My browser of choice
 
 keys = [
         Key([], "XF86AudioMute",
@@ -40,13 +40,14 @@ keys = [
              lazy.spawn("light -U 1"),
              desc='Launches My Terminal'
              ),
+        Key([mod], "p", lazy.spawn("i3lock -B sigma")),
          ### The essentials
          Key([mod], "Return",
              lazy.spawn(myTerm),
              desc='Launches My Terminal'
              ),
          Key([mod, "shift"], "Return",
-             lazy.spawn("dmenu_recency"),
+             lazy.spawn("dmenu_run"),
              desc='Run Launcher'
              ),
          Key([mod], "b",
@@ -167,7 +168,7 @@ keys = [
              lazy.layout.toggle_split(),
              desc='Toggle between split and unsplit sides of stack'
              ),
-       Key(["mod1"], "Tab", lazy.widget["keyboardlayout"].next_keyboard())
+       Key(["mod1"], "Shift_L", lazy.widget["keyboardlayout"].next_keyboard())
 ]
 
 groups = [Group("1", layout='monadtall'),
@@ -179,9 +180,6 @@ groups = [Group("1", layout='monadtall'),
           Group("7", layout='monadtall'),
           Group("8", layout='monadtall'),
           Group("9", layout='monadtall'),
-          Group("10", layout='monadtall'),
-          Group("11", layout='monadtall'),
-          Group("12", layout='monadtall'),
           ]
 
 # Allow MODKEY+[0 through 9] to bind to groups, see https://docs.qtile.org/en/stable/manual/config/groups.html
@@ -358,12 +356,13 @@ def init_widgets_list():
             #            foreground = colors[0],
             #            background = colors[0]
             #            ),
-              widget.ThermalSensor(
+              widget.CPU(
                        foreground = "eff0f7",#colors[4],
                        background = colors[0],
                        threshold = 90,
-                       fmt = 'TEMP: {}',
+                       fmt = 'CPU: {}',
                        padding = 5,
+                       format = "{load_percent:.1f}%"
                        #decorations=[
                        #    BorderDecoration(
                        #        colour = colors[4],
@@ -437,8 +436,9 @@ def init_widgets_list():
               widget.Memory(
                        foreground = "eff0f7",#colors[9],
                        background = colors[0],
+                       measure_mem='G',
                        mouse_callbacks = {'Button1': lambda: qtile.cmd_spawn(myTerm + ' -e htop')},
-                       format = 'MEM:{MemUsed:.0f} MB',
+                       format = 'MEM:{MemUsed:.1f} GB',
                        padding = 5,
                        # decorations=[
                        #     BorderDecoration(
@@ -481,6 +481,7 @@ def init_widgets_list():
               widget.KeyboardLayout(
                        foreground = "eff0f7",#colors[8],
                        background = colors[0],
+                       display_map = {'ara digits' : 'AR', 'us' : 'EN'},
                        configured_keyboards = ["us", "ara digits"],
                        fmt = '{} ',
                        padding = 5,
@@ -510,7 +511,7 @@ def init_widgets_list():
               widget.Clock(
                        foreground = "fc160a",#colors[6],
                        background = colors[0],
-                       format = "%A, %B %d - %I:%M %p ",
+                       format = "%a, %b %d - %I:%M %p ",
                        #decorations=[
                        #    BorderDecoration(
                        #        colour = colors[6],

@@ -5,9 +5,13 @@ prop=$(xinput list-props $mouse_id | grep "libinput Accel Speed ([0-9]*):" | gre
 xinput set-prop $mouse_id $prop -1 &
 copyq &
 #lxsession &
+dunst &
+udiskie &
 numlockx on &
+blueman-applet &
 spectacle -s &
-xrandr --output eDP-1 --gamma .85 &
+xrandr --output eDP-1 --gamma .85:.85:.82 &
+#xrandr --output eDP-1 --gamma .85 &
 picom &
 nm-applet &
 
