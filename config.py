@@ -5,7 +5,6 @@ import socket
 import subprocess
 from libqtile import qtile
 from libqtile.config import Click, Drag, Group, KeyChord, Key, Match, Screen
-from libqtile.command import lazy
 from libqtile import layout, bar, widget, hook
 from libqtile.lazy import lazy
 from libqtile.utils import guess_terminal
@@ -15,7 +14,7 @@ from qtile_extras import widget
 from qtile_extras.widget.decorations import BorderDecoration
 
 mod = "mod4"              # Sets mod key to SUPER/WINDOWS
-myTerm = "alacritty"      # My terminal of choice
+myTerm = "kitty"      # My terminal of choice
 #myTerm = "cool-retro-term"      # My terminal of choice
 myBrowser = "firefox" # My browser of choice
 
@@ -188,8 +187,8 @@ groups = [Group("1", layout='monadtall'),
 from libqtile.dgroups import simple_key_binder
 dgroups_key_binder = simple_key_binder("mod4")
 
-layout_theme = {"border_width": 3,
-                "margin": 8,
+layout_theme = {"border_width": 2,
+                "margin": 0,
                 "border_focus": "018ab7",
                 "border_normal": "1D2330"
                 }
@@ -246,9 +245,10 @@ prompt = "{0}@{1}: ".format(os.environ["USER"], socket.gethostname())
 
 ##### DEFAULT WIDGET SETTINGS #####
 widget_defaults = dict(
-    font="Ubuntu Bold",
-    fontsize = 14,
-    padding = 2,
+    font="Iosevka Nerd Font Bold",
+    fontsize = 18,
+    align= "center",
+    padding = 0,
     background=colors[2]
 )
 extension_defaults = widget_defaults.copy()
@@ -274,7 +274,7 @@ def init_widgets_list():
             #            ),
               widget.GroupBox(
                        font = "Ubuntu Bold",
-                       fontsize = 14,
+                       fontsize = 16,
                        margin_y = 3,
                        margin_x = 0,
                        padding_y = 5,
@@ -541,7 +541,7 @@ def init_widgets_screen2():
     return widgets_screen2                 # Monitor 2 will display all widgets in widgets_list
 
 def init_screens():
-    return [Screen(top=bar.Bar(widgets=init_widgets_screen1(), opacity=1.0, size=20)),
+    return [Screen(top=bar.Bar(widgets=init_widgets_screen1(), opacity=1.0, size=24)),
             Screen(top=bar.Bar(widgets=init_widgets_screen2(), opacity=1.0, size=20)),
             Screen(top=bar.Bar(widgets=init_widgets_screen1(), opacity=1.0, size=20))]
 
