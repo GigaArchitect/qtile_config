@@ -11,7 +11,7 @@ from qtile_extras import widget
 
 mod = "mod4"  # Sets mod key to SUPER/WINDOWS
 myTerm = "kitty"  # My terminal of choice
-myBrowser = "google-chrome-stable"  # My browser of choice
+myBrowser = "brave"  # My browser of choice
 
 keys = [
     Key([], "XF86AudioMute", lazy.spawn("pamixer -t"), desc="Launches My Terminal"),
@@ -37,7 +37,7 @@ keys = [
     Key([mod], "p", lazy.spawn("i3lock -B sigma")),
     ### The essentials
     Key([mod], "Return", lazy.spawn(myTerm), desc="Launches My Terminal"),
-    Key([mod, "shift"], "Return", lazy.spawn("dmenu_run"), desc="Run Launcher"),
+    Key([mod, "shift"], "Return", lazy.spawn("rofi -show drun"), desc="Run Launcher"),
     Key([mod], "b", lazy.spawn(myBrowser), desc="Qutebrowser"),
     Key([mod], "Tab", lazy.next_layout(), desc="Toggle through layouts"),
     Key([mod, "shift"], "q", lazy.window.kill(), desc="Kill active window"),
@@ -147,7 +147,7 @@ dgroups_key_binder = simple_key_binder("mod4")
 
 layout_theme = {
     "border_width": 2,
-    "margin": 0,
+    "margin": 8,
     "border_focus": "018ab7",
     "border_normal": "1D2330",
 }
@@ -254,7 +254,7 @@ def init_widgets_list():
             format="%a, %b %d - %I:%M %p ",
         ),
         widget.Spacer(foreground="eff0f7", background=colors[0]),
-        widget.Systray(background=colors[0]),  # Added padding for Systray
+        widget.Systray(background=colors[0], padding=8),  # Added padding for Systray
         widget.Spacer(length=10, foreground=colors[0], background=colors[0]),
         widget.PulseVolume(
             fmt="🔊:{}",
@@ -306,7 +306,14 @@ def init_widgets_screen2():
 
 def init_screens():
     return [
-        Screen(top=bar.Bar(widgets=init_widgets_screen1(), opacity=1.0, size=24)),
+        Screen(
+            top=bar.Bar(
+                widgets=init_widgets_screen1(),
+                opacity=1.0,
+                size=24,
+                margin=[5, 8, 0, 8],
+            )
+        ),
         # Screen(top=bar.Bar(widgets=init_widgets_screen2(), opacity=1.0, size=20)),
         # Screen(top=bar.Bar(widgets=init_widgets_screen1(), opacity=1.0, size=20)),
     ]
@@ -379,7 +386,8 @@ floating_layout = layout.Floating(
         Match(title="Qalculate!"),  # qalculate-gtk
         Match(wm_class="kdenlive"),  # kdenlive
         Match(wm_class="pinentry-gtk-2"),  # GPG key password entry
-    ]
+        Match(wm_class="goldendict"),
+    ],
 )
 auto_fullscreen = True
 focus_on_window_activation = "smart"
@@ -394,6 +402,17 @@ auto_minimize = True
 def start_once():
     home = os.path.expanduser("~")
     subprocess.call([home + "/.config/qtile/autostart.sh"])
+
+
+@hook.subscribe.client_new
+def center_goldendict(window):
+    if "goldendict" in window.get_wm_class():
+        screen = window.qtile.current_screen
+        window_width = 800  # Desired width
+        window_height = 600  # Desired height
+        x = (screen.width - window_width // 2) // 2
+        y = (screen.height - window_height // 2) // 2
+        window.tweak_float(x=x, y=y, width=window_width, height=window_height)
 
 
 # XXX: Gasp! We're lying here. In fact, nobody really uses or cares about this

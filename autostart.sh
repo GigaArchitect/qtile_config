@@ -8,6 +8,8 @@ copyq &
 dunst &
 udiskie &
 light -N 5 &
+/usr/lib/xfce-polkit/xfce-polkit &
+unclutter &
 numlockx on &
 blueman-applet &
 spectacle -s &
