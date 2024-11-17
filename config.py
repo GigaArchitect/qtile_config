@@ -11,7 +11,7 @@ from qtile_extras import widget
 
 mod = "mod4"  # Sets mod key to SUPER/WINDOWS
 myTerm = "kitty"  # My terminal of choice
-myBrowser = "brave"  # My browser of choice
+myBrowser = "google-chrome-stable"  # My browser of choice
 
 keys = [
     Key([], "XF86AudioMute", lazy.spawn("pamixer -t"), desc="Launches My Terminal"),
@@ -255,30 +255,34 @@ def init_widgets_list():
         ),
         widget.Spacer(foreground="eff0f7", background=colors[0]),
         widget.Systray(background=colors[0], padding=8),  # Added padding for Systray
-        widget.Spacer(length=10, foreground=colors[0], background=colors[0]),
+        widget.Sep(
+            foreground=colors[2], background=colors[0], padding=25, size_percent=60
+        ),
         widget.PulseVolume(
-            fmt="🔊:{}",
+            fmt="Vol:{}",
             foreground=colors[2],
             background=colors[0],
             channel="Master",
             update_interval=0.1,
-            step=5,
-            get_mute_command="pamixer --get-mute",
-            get_volume_command="pamixer --get-volume",
-            mute_command="pamixer -t",
-            volume_up_command="pamixer -i 5",
-            volume_down_command="pamixer -d 5",
+            step=0,
+            scroll=False,
+            scroll_step=0,
         ),
-        widget.Spacer(length=10, foreground=colors[0], background=colors[0]),
+        widget.Sep(
+            foreground=colors[2], background=colors[0], padding=25, size_percent=60
+        ),
         widget.Backlight(
-            backlight_name="intel_backlight", background=colors[0], fmt="☀️:{}"
-        ),
-        widget.Spacer(length=10, foreground=colors[0], background=colors[0]),
-        widget.UPowerWidget(
+            backlight_name="intel_backlight",
             background=colors[0],
-            format="{percent:2.0%}",
+            fmt="BRIGHT:{}",
         ),
-        widget.Spacer(length=10, foreground=colors[0], background=colors[0]),
+        widget.Sep(
+            foreground=colors[2], background=colors[0], padding=25, size_percent=60
+        ),
+        widget.UPowerWidget(background=colors[0], format="{percent:2.0%}"),
+        widget.Sep(
+            foreground=colors[2], background=colors[0], padding=25, size_percent=60
+        ),
         widget.KeyboardLayout(
             foreground="eff0f7",  # colors[8],
             margin=15,  # Increased margin for more space

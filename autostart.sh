@@ -11,7 +11,7 @@ light -N 5 &
 /usr/lib/xfce-polkit/xfce-polkit &
 unclutter &
 numlockx on &
-blueman-applet &
+# blueman-applet &
 spectacle -s &
 #xrandr --output eDP-1 --gamma .85:.85:.82 &
 #xrandr --output eDP-1 --gamma .85 &
