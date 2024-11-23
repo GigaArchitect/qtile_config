@@ -408,15 +408,16 @@ def start_once():
     subprocess.call([home + "/.config/qtile/autostart.sh"])
 
 
-@hook.subscribe.client_new
+@hook.subscribe.client_managed
 def center_goldendict(window):
     if "goldendict" in window.get_wm_class():
-        screen = window.qtile.current_screen
-        window_width = 800  # Desired width
-        window_height = 600  # Desired height
-        x = (screen.width - window_width // 2) // 2
-        y = (screen.height - window_height // 2) // 2
-        window.tweak_float(x=x, y=y, width=window_width, height=window_height)
+        window.center()
+
+
+@hook.subscribe.client_managed
+def center_mpv(window):
+    if "mpv" in window.get_wm_class():
+        window.center()
 
 
 # XXX: Gasp! We're lying here. In fact, nobody really uses or cares about this
