@@ -2,7 +2,6 @@
 import os
 import socket
 import subprocess
-from typing import List
 
 from libqtile import bar, hook, layout, widget
 from libqtile.config import Click, Drag, Group, Key, Match, Screen
@@ -15,6 +14,14 @@ myBrowser = "google-chrome-stable"  # My browser of choice
 
 keys = [
     Key([], "XF86AudioMute", lazy.spawn("pamixer -t"), desc="Launches My Terminal"),
+    Key(
+        [],
+        "Print",
+        lazy.spawn(
+            ["sh", "-c", 'scrot -F /home/cyberman/Pictures/Screenshots/"$(date)".png']
+        ),
+        desc="Launches My Terminal",
+    ),
     Key(
         [mod],
         "f12",
@@ -377,7 +384,7 @@ mouse = [
 
 dgroups_app_rules = []  # type: List
 follow_mouse_focus = True
-bring_front_click = False
+bring_front_click = True
 cursor_warp = False
 
 floating_layout = layout.Floating(
@@ -391,7 +398,7 @@ floating_layout = layout.Floating(
         Match(wm_class="kdenlive"),  # kdenlive
         Match(wm_class="pinentry-gtk-2"),  # GPG key password entry
         Match(wm_class="goldendict"),
-    ],
+    ], always_on_top=True
 )
 auto_fullscreen = True
 focus_on_window_activation = "smart"
