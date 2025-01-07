@@ -193,7 +193,7 @@ layouts = [
         vspace=3,
         panel_width=200,
     ),
-    layout.Floating(**layout_theme),
+    layout.Floating(**layout_theme, always_on_top=True),
 ]
 
 colors = [
@@ -261,7 +261,7 @@ def init_widgets_list():
             format="%a, %b %d - %I:%M %p ",
         ),
         widget.Spacer(foreground="eff0f7", background=colors[0]),
-        widget.Systray(background=colors[0], padding=8),  # Added padding for Systray
+        widget.Systray(background=colors[0], padding=10, icon_size = 20),  # Added padding for Systray
         widget.Sep(
             foreground=colors[2], background=colors[0], padding=25, size_percent=60
         ),
@@ -337,36 +337,6 @@ if __name__ in ["config", "__main__"]:
     # widgets_screen2 = init_widgets_screen2()
 
 
-def window_to_prev_group(qtile):
-    if qtile.currentWindow is not None:
-        i = qtile.groups.index(qtile.currentGroup)
-        qtile.currentWindow.togroup(qtile.groups[i - 1].name)
-
-
-def window_to_next_group(qtile):
-    if qtile.currentWindow is not None:
-        i = qtile.groups.index(qtile.currentGroup)
-        qtile.currentWindow.togroup(qtile.groups[i + 1].name)
-
-
-def window_to_previous_screen(qtile):
-    i = qtile.screens.index(qtile.current_screen)
-    if i != 0:
-        group = qtile.screens[i - 1].group.name
-        qtile.current_window.togroup(group)
-
-
-def window_to_next_screen(qtile):
-    i = qtile.screens.index(qtile.current_screen)
-    if i + 1 != len(qtile.screens):
-        group = qtile.screens[i + 1].group.name
-        qtile.current_window.togroup(group)
-
-
-def switch_screens(qtile):
-    i = qtile.screens.index(qtile.current_screen)
-    group = qtile.screens[i - 1].group
-    qtile.current_screen.set_group(group)
 
 
 mouse = [
@@ -403,11 +373,10 @@ floating_layout = layout.Floating(
 auto_fullscreen = True
 focus_on_window_activation = "smart"
 reconfigure_screens = True
-
+floats_kept_above = True
 # If things like steam games want to auto-minimize themselves when losing
 # focus, should we respect this or not?
 auto_minimize = True
-
 
 @hook.subscribe.startup_once
 def start_once():
@@ -425,7 +394,17 @@ def center_goldendict(window):
 def center_mpv(window):
     if "mpv" in window.get_wm_class():
         window.center()
+#################################################################### so stupid, qtile should fix this ####################################
+def bring_floating_to_front(qtile):
+    """
+    Bring all floating windows of the current group to the front
+    """
+    for window in qtile.current_group.windows:
+        if window.floating:
+            window.bring_to_front()
 
+keys.append(Key([mod], "s", lazy.function(bring_floating_to_front), desc="Bring floating windows to the front"))
+##########################################################################################################################################
 
 # XXX: Gasp! We're lying here. In fact, nobody really uses or cares about this
 # string besides java UI toolkits; you can see several discussions on the

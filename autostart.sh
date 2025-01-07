@@ -6,11 +6,12 @@ redshift -c ~/.config/redshift/redshift.conf &
 copyq &
 /usr/lib/pam_kwallet_init &
 #lxsession &
-# dunst &
+dunst &
 # udiskie &
 #
 light -N 5 &
 /usr/lib/xfce-polkit/xfce-polkit &
+unclutter &
 # blueman-applet &
 spectacle -s &
 picom &
