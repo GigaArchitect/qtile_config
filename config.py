@@ -3,8 +3,11 @@ import os
 import socket
 import subprocess
 
-from libqtile import bar, hook, layout, widget
-from libqtile.config import Click, Drag, Group, Key, Match, Screen
+from libqtile.backend.wayland.inputs import InputConfig
+from libqtile.config import Screen
+from libqtile import bar, hook, layout
+from libqtile.dgroups import simple_key_binder
+from libqtile.config import Click, Drag, Group, Key, Match
 from libqtile.lazy import lazy
 from qtile_extras import widget
 
@@ -41,14 +44,14 @@ keys = [
         lazy.spawn("light -U 5"),
         desc="Decrease Brightness",
     ),
-    Key([mod], "p", lazy.spawn("i3lock -B sigma")),
+    Key([mod], "p", lazy.spawn("i3lock -B 10")),
     ### The essentials
     Key([mod], "Return", lazy.spawn(myTerm), desc="Launches My Terminal"),
-    Key([mod, "shift"], "Return", lazy.spawn("rofi -show drun"), desc="Run Launcher"),
+    Key([mod, "shift"], "Return", lazy.spawn("rofi -show drun -show-icons"), desc="Run Launcher"),
     Key([mod], "b", lazy.spawn(myBrowser), desc="Qutebrowser"),
     Key([mod], "Tab", lazy.next_layout(), desc="Toggle through layouts"),
     Key([mod, "shift"], "q", lazy.window.kill(), desc="Kill active window"),
-    Key([mod, "shift"], "r", lazy.restart(), desc="Restart Qtile"),
+    Key([mod, "shift"], "r", lazy.reload_config(), desc="Restart Qtile"),
     Key([mod, "shift"], "c", lazy.shutdown(), desc="Shutdown Qtile"),
     ### Switch focus to specific monitor (out of three)
     Key([mod], "w", lazy.to_screen(0), desc="Keyboard focus to monitor 1"),
@@ -77,19 +80,36 @@ keys = [
         [mod, "shift"],
         "j",
         lazy.layout.shuffle_down(),
-        lazy.layout.section_down(),
+        lazy.layout.section_down().when(layout="treetab"),
         desc="Move windows down in current stack",
     ),
     Key(
         [mod, "shift"],
         "k",
         lazy.layout.shuffle_up(),
-        lazy.layout.section_up(),
+        lazy.layout.section_up().when(layout="treetab"),
         desc="Move windows up in current stack",
     ),
     Key(
         [mod],
         "h",
+        lazy.layout.shrink_main().when(layout="monadtall"),
+        # lazy.layout.shrink(),
+        lazy.layout.decrease_nmaster(),
+        desc="Shrink window (MonadTall), decrease number in master pane (Tile)",
+    ),
+    Key(
+        [mod],
+        "Up",
+        # lazy.layout.grow_main().when(layout="monadtall"),
+        lazy.layout.grow(),
+        lazy.layout.increase_nmaster(),
+        desc="Expand window (MonadTall), increase number in master pane (Tile)",
+    ),
+    Key(
+        [mod],
+        "Down",
+        # lazy.layout.shrink_main().when(layout="monadtall"),
         lazy.layout.shrink(),
         lazy.layout.decrease_nmaster(),
         desc="Shrink window (MonadTall), decrease number in master pane (Tile)",
@@ -97,7 +117,8 @@ keys = [
     Key(
         [mod],
         "l",
-        lazy.layout.grow(),
+        lazy.layout.grow_main().when(layout="monadtall"),
+        # lazy.layout.grow(),
         lazy.layout.increase_nmaster(),
         desc="Expand window (MonadTall), increase number in master pane (Tile)",
     ),
@@ -148,9 +169,8 @@ groups = [
 # Allow MODKEY+[0 through 9] to bind to groups, see https://docs.qtile.org/en/stable/manual/config/groups.html
 # MOD4 + index Number : Switch to Group[index]
 # MOD4 + shift + index Number : Send active window to another Group
-from libqtile.dgroups import simple_key_binder
 
-dgroups_key_binder = simple_key_binder("mod4")
+dgroups_key_binder = simple_key_binder(mod)
 
 layout_theme = {
     "border_width": 2,
@@ -193,7 +213,7 @@ layouts = [
         vspace=3,
         panel_width=200,
     ),
-    layout.Floating(**layout_theme, always_on_top=True),
+    layout.Floating(**layout_theme),
 ]
 
 colors = [
@@ -352,11 +372,6 @@ mouse = [
     Click([mod], "Button2", lazy.window.bring_to_front()),
 ]
 
-dgroups_app_rules = []  # type: List
-follow_mouse_focus = True
-bring_front_click = True
-cursor_warp = False
-
 floating_layout = layout.Floating(
     float_rules=[
         # Run the utility of `xprop` to see the wm class and name of an X client.
@@ -368,14 +383,16 @@ floating_layout = layout.Floating(
         Match(wm_class="kdenlive"),  # kdenlive
         Match(wm_class="pinentry-gtk-2"),  # GPG key password entry
         Match(wm_class="goldendict"),
-    ], always_on_top=True
+    ]
 )
+
+follow_mouse_focus = True
+bring_front_click = True
+cursor_warp = False
 auto_fullscreen = True
 focus_on_window_activation = "smart"
 reconfigure_screens = True
 floats_kept_above = True
-# If things like steam games want to auto-minimize themselves when losing
-# focus, should we respect this or not?
 auto_minimize = True
 
 @hook.subscribe.startup_once
@@ -383,18 +400,11 @@ def start_once():
     home = os.path.expanduser("~")
     subprocess.call([home + "/.config/qtile/autostart.sh"])
 
-
 @hook.subscribe.client_managed
-def center_goldendict(window):
-    if "goldendict" in window.get_wm_class():
+def center_specific_windows(window):
+    if window.window.get_wm_class()[0] in ["goldendict", "mpv"]:
         window.center()
 
-
-@hook.subscribe.client_managed
-def center_mpv(window):
-    if "mpv" in window.get_wm_class():
-        window.center()
-#################################################################### so stupid, qtile should fix this ####################################
 def bring_floating_to_front(qtile):
     """
     Bring all floating windows of the current group to the front
@@ -404,14 +414,24 @@ def bring_floating_to_front(qtile):
             window.bring_to_front()
 
 keys.append(Key([mod], "s", lazy.function(bring_floating_to_front), desc="Bring floating windows to the front"))
-##########################################################################################################################################
 
-# XXX: Gasp! We're lying here. In fact, nobody really uses or cares about this
-# string besides java UI toolkits; you can see several discussions on the
-# mailing lists, GitHub issues, and other WM documentation that suggest setting
-# this string if your java app doesn't work correctly. We may as well just lie
-# and say that we're a working one by default.
+wl_input_rules = {
+    "type:touchpad": InputConfig(
+        tap=True,                 # The settings you care most about
+        natural_scroll=True,
+        pointer_accel=0.5,
+        dwt=True
+    )
+}
+
+# wl_output_rules = {
+#     "eDP-1": OutputConfig(  # Replace "eDP-1" with your display name
+#         scale=1.5,         # Scaling factor (1.0 is 100%, 2.0 is 200%, etc.)
+#         mode="1920x1080@60",  # Optional: Set resolution and refresh rate
+#     ),
+#     "*": OutputConfig(     # Default for all other outputs
+#         scale=1.0,
+#     ),
+# }
 #
-# We choose LG3D to maximize irony: it is a 3D non-reparenting WM written in
-# java that happens to be on java's whitelist.
 wmname = "LG3D"
